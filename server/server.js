@@ -8,11 +8,24 @@ var {Todo} = require('./models/todo');
 
 var app = express();
 app.use(bodyParser.json());
-app.post('',(req,res)=>{
-    console.log(req.body);
+app.post('/todos',(req,res)=>{
+    var todo = new Todo({
+        text : req.body.text
+    });
+    todo.save().then((doc)=>{
+        res.send(doc);
+    },(err)=>{
+        res.status(400).send(err);
+    });
 });
 
-
+app.get('/todos',(req,res)=>{
+    Todo.find().then((todos)=>{
+        res.send({todos});
+    },(er)=>{
+        res.status(400).send(er);
+    });
+});
 
 
 app.listen(3000,()=>{
