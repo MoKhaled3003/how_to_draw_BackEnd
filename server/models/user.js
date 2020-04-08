@@ -44,7 +44,7 @@ UserSchema.methods.toJSON = function () {
     var user = this;
     var userObject = user.toObject();
 
-    return _.pick(userObject,['_id','email']);
+    return _.pick(userObject,['_id','user_name']);
 };
 
 UserSchema.methods.generateAuthToken = function () {
@@ -89,10 +89,10 @@ UserSchema.pre('save',function (next) {
     
 });
 
-UserSchema.statics.findByCredentials = function (email,password) {
+UserSchema.statics.findByCredentials = function (user_name,password) {
     var User = this;
     
-    return User.findOne({email}).then((user)=>{
+    return User.findOne({user_name}).then((user)=>{
         if(!user){
             return new Promise.reject();
         }

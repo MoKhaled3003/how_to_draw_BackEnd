@@ -2,6 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const {ObjectID} = require('mongodb');
 const _ = require('lodash');
+const cors = require('cors');
+
 
 var {mongoose} = require('./db/mongoose');
 var {User} = require('./models/user');
@@ -10,12 +12,20 @@ var {authenticate} = require('./../middleware/authenticate');
 
 var app = express();
 
-const port = process.env.PORT || 3000;
+const port = process.env.DRAWPORT || 3000;
 
 app.use(bodyParser.json());
+const corsOptions = {
+    exposedHeaders: 'x-auth',
+  };
+app.use((req, res, next) => {
+    res.set('Access-Control-Allow-Origin', '*')
+    next()
+  })
+  app.use(cors(corsOptions));
 
 app.post('/users',(req,res)=>{
-    var body = _.pick(req.body,["email","password"]);
+    var body = _.pick(req.body,["name","user_name","gender","birthday","password"]);
     var user = new User(body);
     user.save().then((user)=>{
        return user.generateAuthToken();
@@ -35,10 +45,10 @@ app.get('/users/me',authenticate,(req,res)=>{
 
 
 app.post('/users/login',(req,res)=>{
-    var body = _.pick(req.body,['email','password']);
+    var body = _.pick(req.body,['user_name','password']);
 
-    User.findByCredentials(body.email,body.password).then((user)=>{
-            res.send(user);
+    User.findByCredentials(body.user_name,body.password).then((user)=>{
+        res.send(user);
     }).catch((er)=>{
         res.status(400).send(er);
     });
